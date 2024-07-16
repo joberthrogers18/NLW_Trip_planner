@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,11 +38,20 @@ public class Trip {
   @Column(name = "is_confirmed", nullable = false)
   private Boolean isConfirmed;
 
-  @Column(name="owner_name", nullable = false, length = 255)
+  @Column(name = "owner_name", nullable = false, length = 255)
   private String ownerName;
 
-  @Column(name="owner_email", nullable = false, length = 255)
-  private String onwerEmail;
+  @Column(name = "owner_email", nullable = false, length = 255)
+  private String ownerEmail;
 
+
+  public Trip(TripRequestPayload data) {
+    this.destination = data.destination();
+    this.isConfirmed = false;
+    this.ownerName = data.owner_name();
+    this.ownerEmail = data.owner_email();
+    this.endsAt = LocalDateTime.parse(data.end_at(), DateTimeFormatter.ISO_DATE_TIME);
+    this.startsAt = LocalDateTime.parse(data.starts_at(), DateTimeFormatter.ISO_DATE_TIME);
+  }
 
 }
