@@ -1,9 +1,11 @@
 package com.rocketseat.planner.trip;
 
 import com.rocketseat.planner.participants.ParticipantService;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,12 +17,17 @@ public class TripController {
   @Autowired
   private ParticipantService participantService;
 
+  @Autowired
+  private TripRepository tripRepository;
+
+  @PostMapping
   public ResponseEntity<String> createTrip(@RequestBody TripRequestPayload payload) {
     Trip newTrip = new Trip(payload);
 
-    participantService.registerParticipantToEvent(payload.emails_to_invite());
+    this.tripRepository.save(newTrip);
+    participantService.registerParticipantToEvent(payload.emails_to_invite(), UUID.randomUUID());
 
-    return ResponseEntity.status(HttpStatus.OK).body("");
+    return ResponseEntity.ok().body("Sucesso");
   }
 
 }
