@@ -60,6 +60,6 @@ public class TripController {
       return ResponseEntity.ok(rawTrip);
     }
 
-    return currentTrip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.notFound().build();
   }
 }
