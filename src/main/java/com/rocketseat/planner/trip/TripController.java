@@ -4,6 +4,7 @@ import com.rocketseat.planner.participants.InviteResponseTrip;
 import com.rocketseat.planner.participants.Participant;
 import com.rocketseat.planner.participants.ParticipantRequestPayload;
 import com.rocketseat.planner.participants.ParticipantService;
+import com.rocketseat.planner.participants.ParticipantsData;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -88,7 +89,8 @@ public class TripController {
 
     if (currentTrip.isPresent()) {
       Trip rawTrip = currentTrip.get();
-      InviteResponseTrip response =  this.participantService.registerParticipantToEvent(payload.email(), rawTrip);
+      InviteResponseTrip response = this.participantService.registerParticipantToEvent(
+          payload.email(), rawTrip);
 
       if (rawTrip.getIsConfirmed()) {
         this.participantService.triggerConfirmationEmailToParticipant(payload.email());
@@ -101,8 +103,9 @@ public class TripController {
   }
 
   @GetMapping("/{tripId}/participants")
-  public ResponseEntity<List<Participant>> getParticipantsFromTrip(@PathVariable("tripId") UUID tripId) {
-    List<Participant> participants = this.participantService.getAllParticipants(tripId);
+  public ResponseEntity<List<ParticipantsData>> getParticipantsFromTrip(
+      @PathVariable("tripId") UUID tripId) {
+    List<ParticipantsData> participants = this.participantService.getAllParticipants(tripId);
     return ResponseEntity.ok(participants);
   }
 
