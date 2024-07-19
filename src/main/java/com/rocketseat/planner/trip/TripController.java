@@ -1,12 +1,13 @@
 package com.rocketseat.planner.trip;
 
+import com.rocketseat.planner.participants.InviteResponseTrip;
+import com.rocketseat.planner.participants.ParticipantRequestPayload;
 import com.rocketseat.planner.participants.ParticipantService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -32,7 +32,7 @@ public class TripController {
     Trip newTrip = new Trip(payload);
 
     this.tripRepository.save(newTrip);
-    participantService.registerParticipantToEvent(payload.emails_to_invite(), newTrip);
+    participantService.registerParticipantsToEvent(payload.emails_to_invite(), newTrip);
 
     return ResponseEntity.ok().body(new TripCreateResponse(newTrip.getId()));
   }
@@ -77,4 +77,25 @@ public class TripController {
 
     return ResponseEntity.notFound().build();
   }
+
+  @PostMapping("/{tripId}/invite")
+  public ResponseEntity<InviteResponseTrip> inviteParticipant(@PathVariable("tripId") UUID tripId,
+      @RequestBody
+      ParticipantRequestPayload payload) {
+    Optional<Trip> currentTrip = this.tripRepository.findById(tripId);
+
+    if (currentTrip.isPresent()) {
+      Trip rawTrip = currentTrip.get();
+      InviteResponseTrip response =  this.participantService.registerParticipantToEvent(payload.email(), rawTrip);
+
+      if (rawTrip.getIsConfirmed()) {
+        this.participantService.triggerConfirmationEmailToParticipant(payload.email());
+      }
+
+      return ResponseEntity.ok(response);
+    }
+
+    return ResponseEntity.notFound().build();
+  }
+
 }
