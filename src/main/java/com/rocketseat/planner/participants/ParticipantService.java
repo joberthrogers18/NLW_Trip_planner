@@ -29,4 +29,8 @@ public class ParticipantService {
 
   }
 
+  public List<Participant> getAllParticipants(UUID tripId) {
+    return this.participantRepository.findByTripId(tripId);
+  }
+
 }

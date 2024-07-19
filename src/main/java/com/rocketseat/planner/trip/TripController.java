@@ -1,10 +1,12 @@
 package com.rocketseat.planner.trip;
 
 import com.rocketseat.planner.participants.InviteResponseTrip;
+import com.rocketseat.planner.participants.Participant;
 import com.rocketseat.planner.participants.ParticipantRequestPayload;
 import com.rocketseat.planner.participants.ParticipantService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +98,12 @@ public class TripController {
     }
 
     return ResponseEntity.notFound().build();
+  }
+
+  @GetMapping("/{tripId}/participants")
+  public ResponseEntity<List<Participant>> getParticipantsFromTrip(@PathVariable("tripId") UUID tripId) {
+    List<Participant> participants = this.participantService.getAllParticipants(tripId);
+    return ResponseEntity.ok(participants);
   }
 
 }
