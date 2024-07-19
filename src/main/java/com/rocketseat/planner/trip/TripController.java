@@ -1,5 +1,7 @@
 package com.rocketseat.planner.trip;
 
+import com.rocketseat.planner.activity.Activity;
+import com.rocketseat.planner.activity.ActivityData;
 import com.rocketseat.planner.activity.ActivityRequestPayload;
 import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
@@ -125,6 +127,18 @@ public class TripController {
           LocalDateTime.parse(payload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip.get());
 
       return ResponseEntity.ok(new ActivityResponsePayload(activityId.toString()));
+    }
+
+    return ResponseEntity.notFound().build();
+  }
+
+  @GetMapping("/{tripId}/activities")
+  public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable("tripId") UUID tripId) {
+    Optional<Trip> trip = this.tripRepository.findById(tripId);
+
+    if (trip.isPresent()) {
+      List<ActivityData> activities = this.activityService.getAllActivitiesFromId(tripId);
+      return ResponseEntity.ok(activities);
     }
 
     return ResponseEntity.notFound().build();
