@@ -1,5 +1,8 @@
 package com.rocketseat.planner.trip;
 
+import com.rocketseat.planner.activity.ActivityRequestPayload;
+import com.rocketseat.planner.activity.ActivityResponsePayload;
+import com.rocketseat.planner.activity.ActivityService;
 import com.rocketseat.planner.participants.InviteResponseTrip;
 import com.rocketseat.planner.participants.Participant;
 import com.rocketseat.planner.participants.ParticipantRequestPayload;
@@ -29,6 +32,9 @@ public class TripController {
 
   @Autowired
   private TripRepository tripRepository;
+
+  @Autowired
+  private ActivityService activityService;
 
   @PostMapping
   public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
@@ -107,6 +113,21 @@ public class TripController {
       @PathVariable("tripId") UUID tripId) {
     List<ParticipantsData> participants = this.participantService.getAllParticipants(tripId);
     return ResponseEntity.ok(participants);
+  }
+
+  @PostMapping("/{tripId}/activities")
+  public ResponseEntity<ActivityResponsePayload> registerActivity(@PathVariable("tripId") UUID tripId, @RequestBody
+  ActivityRequestPayload payload) {
+    Optional<Trip> trip = this.tripRepository.findById(tripId);
+
+    if (trip.isPresent()) {
+      UUID activityId = this.activityService.registerActivity(payload.title(),
+          LocalDateTime.parse(payload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip.get());
+
+      return ResponseEntity.ok(new ActivityResponsePayload(activityId.toString()));
+    }
+
+    return ResponseEntity.notFound().build();
   }
 
 }

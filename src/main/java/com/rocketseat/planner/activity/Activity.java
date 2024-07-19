@@ -38,4 +38,10 @@ public class Activity {
   @JoinColumn(name = "trip_id", nullable = false)
   private Trip trip;
 
+  public Activity(String title, LocalDateTime occursAt, Trip trip) {
+    this.title = title;
+    this.occursAt = occursAt;
+    this.trip = trip;
+  }
+
 }
