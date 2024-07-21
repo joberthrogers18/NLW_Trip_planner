@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+// TODO: handle all requests with try catch
+
 @RestController
 @RequestMapping("/trips")
 public class TripController {
@@ -172,6 +174,18 @@ public class TripController {
     return ResponseEntity.notFound().build();
   }
 
+  // TODO: improve to deal error globally and when recover data that not exist show the specifically response
 
+  @GetMapping("/{tripId}/links")
+  public ResponseEntity<List<LinkResponsePayload>> getAALinks(@PathVariable("tripId") UUID id) {
+    Optional<Trip>  trip = this.tripRepository.findById(id);
+
+    if (trip.isPresent()) {
+      List<LinkResponsePayload> linksTrip = this.linkService.getAllLinksById(id);
+      return ResponseEntity.ok(linksTrip);
+    }
+
+    return ResponseEntity.notFound().build();
+  }
 
 }
