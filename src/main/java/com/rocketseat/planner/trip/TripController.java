@@ -1,15 +1,13 @@
 package com.rocketseat.planner.trip;
 
-import com.rocketseat.planner.activity.Activity;
 import com.rocketseat.planner.activity.ActivityData;
 import com.rocketseat.planner.activity.ActivityRequestPayload;
 import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
-import com.rocketseat.planner.participants.InviteResponseTrip;
-import com.rocketseat.planner.participants.Participant;
-import com.rocketseat.planner.participants.ParticipantRequestPayload;
-import com.rocketseat.planner.participants.ParticipantService;
-import com.rocketseat.planner.participants.ParticipantsData;
+import com.rocketseat.planner.participant.InviteResponseTrip;
+import com.rocketseat.planner.participant.ParticipantRequestPayload;
+import com.rocketseat.planner.participant.ParticipantService;
+import com.rocketseat.planner.participant.ParticipantsData;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
