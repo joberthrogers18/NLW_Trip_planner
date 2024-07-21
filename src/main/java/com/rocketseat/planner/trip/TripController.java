@@ -4,6 +4,9 @@ import com.rocketseat.planner.activity.ActivityData;
 import com.rocketseat.planner.activity.ActivityRequestPayload;
 import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
+import com.rocketseat.planner.link.LinkRequestPayload;
+import com.rocketseat.planner.link.LinkResponsePayload;
+import com.rocketseat.planner.link.LinkService;
 import com.rocketseat.planner.participant.InviteResponseTrip;
 import com.rocketseat.planner.participant.ParticipantRequestPayload;
 import com.rocketseat.planner.participant.ParticipantService;
@@ -13,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.swing.text.html.Option;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +39,11 @@ public class TripController {
 
   @Autowired
   private ActivityService activityService;
+
+  @Autowired
+  private LinkService linkService;
+
+  // Endpoints Manipulation Trip
 
   @PostMapping
   public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
@@ -87,6 +96,38 @@ public class TripController {
     return ResponseEntity.notFound().build();
   }
 
+  // Endpoints Activities Trip
+
+  @PostMapping("/{tripId}/activities")
+  public ResponseEntity<ActivityResponsePayload> registerActivity(@PathVariable("tripId") UUID tripId, @RequestBody
+  ActivityRequestPayload payload) {
+    Optional<Trip> trip = this.tripRepository.findById(tripId);
+
+    if (trip.isPresent()) {
+      UUID activityId = this.activityService.registerActivity(payload.title(),
+          LocalDateTime.parse(payload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip.get());
+
+      return ResponseEntity.ok(new ActivityResponsePayload(activityId.toString()));
+    }
+
+    return ResponseEntity.notFound().build();
+  }
+
+
+  @GetMapping("/{tripId}/activities")
+  public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable("tripId") UUID tripId) {
+    Optional<Trip> trip = this.tripRepository.findById(tripId);
+
+    if (trip.isPresent()) {
+      List<ActivityData> activities = this.activityService.getAllActivitiesFromId(tripId);
+      return ResponseEntity.ok(activities);
+    }
+
+    return ResponseEntity.notFound().build();
+  }
+
+  // Endpoints Participants Trip
+
   @PostMapping("/{tripId}/invite")
   public ResponseEntity<InviteResponseTrip> inviteParticipant(@PathVariable("tripId") UUID tripId,
       @RequestBody
@@ -115,31 +156,22 @@ public class TripController {
     return ResponseEntity.ok(participants);
   }
 
-  @PostMapping("/{tripId}/activities")
-  public ResponseEntity<ActivityResponsePayload> registerActivity(@PathVariable("tripId") UUID tripId, @RequestBody
-  ActivityRequestPayload payload) {
+  // Endpoints Links Trip
+
+  @PostMapping("/{tripId}/links")
+  public ResponseEntity<LinkResponsePayload> registerLink(@PathVariable("tripId") UUID tripId, @RequestBody
+      LinkRequestPayload payload) {
+
     Optional<Trip> trip = this.tripRepository.findById(tripId);
 
     if (trip.isPresent()) {
-      UUID activityId = this.activityService.registerActivity(payload.title(),
-          LocalDateTime.parse(payload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip.get());
-
-      return ResponseEntity.ok(new ActivityResponsePayload(activityId.toString()));
+      LinkResponsePayload response = this.linkService.registerLinkToTrip(payload, trip.get());
+      return ResponseEntity.ok(response);
     }
 
     return ResponseEntity.notFound().build();
   }
 
-  @GetMapping("/{tripId}/activities")
-  public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable("tripId") UUID tripId) {
-    Optional<Trip> trip = this.tripRepository.findById(tripId);
 
-    if (trip.isPresent()) {
-      List<ActivityData> activities = this.activityService.getAllActivitiesFromId(tripId);
-      return ResponseEntity.ok(activities);
-    }
-
-    return ResponseEntity.notFound().build();
-  }
 
 }
