@@ -1,4 +1,4 @@
-package com.rocketseat.planner.participants;
+package com.rocketseat.planner.participant;
 
 import com.rocketseat.planner.trip.Trip;
 import java.util.List;

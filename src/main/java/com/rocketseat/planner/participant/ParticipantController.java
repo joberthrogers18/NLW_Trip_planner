@@ -1,4 +1,4 @@
-package com.rocketseat.planner.participants;
+package com.rocketseat.planner.participant;
 
 import java.util.Optional;
 import java.util.UUID;
