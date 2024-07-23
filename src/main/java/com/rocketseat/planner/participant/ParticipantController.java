@@ -1,5 +1,6 @@
 package com.rocketseat.planner.participant;
 
+import com.rocketseat.planner.exceptions.DataNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/participants")
 public class ParticipantController {
 
+  private final ParticipantRepository participantRepository;
+
   @Autowired
-  private ParticipantRepository participantRepository;
+  public ParticipantController(ParticipantRepository participantRepository) {
+    this.participantRepository = participantRepository;
+  }
 
   @PostMapping("/{idParticipant}/confirm")
   public ResponseEntity<Participant> confirmParticipant(@PathVariable("idParticipant") UUID id,
@@ -31,7 +36,7 @@ public class ParticipantController {
       return ResponseEntity.ok(rawParticipant);
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The Participant " + id + " was not found in database");
   }
 
 }
