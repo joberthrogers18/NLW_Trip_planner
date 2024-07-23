@@ -4,6 +4,7 @@ import com.rocketseat.planner.activity.ActivityData;
 import com.rocketseat.planner.activity.ActivityRequestPayload;
 import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
+import com.rocketseat.planner.exceptions.DataNotFoundException;
 import com.rocketseat.planner.link.LinkRequestPayload;
 import com.rocketseat.planner.link.LinkResponsePayload;
 import com.rocketseat.planner.link.LinkService;
@@ -80,7 +81,7 @@ public class TripController {
       return ResponseEntity.ok(rawTrip);
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The trip " + tripId + " was not found");
   }
 
   @GetMapping("/{tripId}/confirm")
@@ -95,7 +96,7 @@ public class TripController {
       return ResponseEntity.ok(rawTrip);
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The trip " + tripId + " was not found");
   }
 
   // Endpoints Activities Trip
@@ -113,7 +114,7 @@ public class TripController {
       return ResponseEntity.ok(new ActivityResponsePayload(activityId.toString()));
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The trip " + tripId + " was not found");
   }
 
 
@@ -126,7 +127,7 @@ public class TripController {
       return ResponseEntity.ok(activities);
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The trip " + tripId + " was not found");
   }
 
   // Endpoints Participants Trip
@@ -149,7 +150,7 @@ public class TripController {
       return ResponseEntity.ok(response);
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The trip " + tripId + " was not found");
   }
 
   @GetMapping("/{tripId}/participants")
@@ -173,21 +174,21 @@ public class TripController {
       return ResponseEntity.ok(response);
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The trip " + tripId + " was not found");
   }
 
   // TODO: improve to deal error globally and when recover data that not exist show the specifically response
 
   @GetMapping("/{tripId}/links")
-  public ResponseEntity<List<LinkResponsePayload>> getAALinks(@PathVariable("tripId") UUID id) {
-    Optional<Trip> trip = this.tripRepository.findById(id);
+  public ResponseEntity<List<LinkResponsePayload>> getAALinks(@PathVariable("tripId") UUID tripId) {
+    Optional<Trip> trip = this.tripRepository.findById(tripId);
 
     if (trip.isPresent()) {
-      List<LinkResponsePayload> linksTrip = this.linkService.getAllLinksById(id);
+      List<LinkResponsePayload> linksTrip = this.linkService.getAllLinksById(tripId);
       return ResponseEntity.ok(linksTrip);
     }
 
-    return ResponseEntity.notFound().build();
+    throw new DataNotFoundException("The trip " + tripId + " was not found");
   }
 
 }
