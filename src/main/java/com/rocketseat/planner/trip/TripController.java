@@ -101,7 +101,8 @@ public class TripController {
   // Endpoints Activities Trip
 
   @PostMapping("/{tripId}/activities")
-  public ResponseEntity<ActivityResponsePayload> registerActivity(@PathVariable("tripId") UUID tripId, @RequestBody
+  public ResponseEntity<ActivityResponsePayload> registerActivity(
+      @PathVariable("tripId") UUID tripId, @RequestBody
   ActivityRequestPayload payload) {
     Optional<Trip> trip = this.tripRepository.findById(tripId);
 
@@ -161,7 +162,8 @@ public class TripController {
   // Endpoints Links Trip
 
   @PostMapping("/{tripId}/links")
-  public ResponseEntity<LinkResponsePayload> registerLink(@PathVariable("tripId") UUID tripId, @RequestBody
+  public ResponseEntity<LinkResponsePayload> registerLink(@PathVariable("tripId") UUID tripId,
+      @RequestBody
       LinkRequestPayload payload) {
 
     Optional<Trip> trip = this.tripRepository.findById(tripId);
@@ -178,7 +180,7 @@ public class TripController {
 
   @GetMapping("/{tripId}/links")
   public ResponseEntity<List<LinkResponsePayload>> getAALinks(@PathVariable("tripId") UUID id) {
-    Optional<Trip>  trip = this.tripRepository.findById(id);
+    Optional<Trip> trip = this.tripRepository.findById(id);
 
     if (trip.isPresent()) {
       List<LinkResponsePayload> linksTrip = this.linkService.getAllLinksById(id);
