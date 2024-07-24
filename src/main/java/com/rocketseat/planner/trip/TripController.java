@@ -38,32 +38,29 @@ public class TripController {
   private final TripRepository tripRepository;
   private final ActivityService activityService;
   private final LinkService linkService;
+  private final TripService tripService;
 
   public TripController(ParticipantService participantService, TripRepository tripRepository,
-      ActivityService activityService, LinkService linkService) {
+      ActivityService activityService, LinkService linkService, TripService tripService) {
     this.participantService = participantService;
     this.tripRepository = tripRepository;
     this.activityService = activityService;
     this.linkService = linkService;
+    this.tripService = tripService;
   }
 
   // Endpoints Manipulation Trip
 
   @PostMapping
-  public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
-    Trip newTrip = new Trip(payload);
-
-    this.tripRepository.save(newTrip);
-    participantService.registerParticipantsToEvent(payload.emails_to_invite(), newTrip);
-
+  public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payloadTrip) {
+    Trip newTrip = this.tripService.registerTrip(payloadTrip);
     return ResponseEntity.ok().body(new TripCreateResponse(newTrip.getId()));
   }
 
   @GetMapping("/{tripId}")
-  public ResponseEntity<Trip> getTripById(@PathVariable("tripId") UUID id) {
-    Optional<Trip> trip = this.tripRepository.findById(id);
-
-    return trip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+  public ResponseEntity<Trip> getTripById(@PathVariable("tripId") UUID tripId) {
+    Trip tripResponse = this.tripService.getTripById(tripId);
+    return ResponseEntity.ok(tripResponse);
   }
 
   @PutMapping("/{tripId}")
