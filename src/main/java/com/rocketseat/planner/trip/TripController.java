@@ -28,23 +28,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// TODO: handle all requests with try catch
-
 @RestController
 @RequestMapping("/trips")
 public class TripController {
 
-  @Autowired
-  private ParticipantService participantService;
+  private static final String ERROR_TRIP_NOT_FOUND_MESSAGE = "The trip {tripId} was not found";
+  private static final String KEY_REPLACE_MESSAGE_ERROR = "{tripId}";
+  private final ParticipantService participantService;
+  private final TripRepository tripRepository;
+  private final ActivityService activityService;
+  private final LinkService linkService;
 
-  @Autowired
-  private TripRepository tripRepository;
-
-  @Autowired
-  private ActivityService activityService;
-
-  @Autowired
-  private LinkService linkService;
+  public TripController(ParticipantService participantService, TripRepository tripRepository,
+      ActivityService activityService, LinkService linkService) {
+    this.participantService = participantService;
+    this.tripRepository = tripRepository;
+    this.activityService = activityService;
+    this.linkService = linkService;
+  }
 
   // Endpoints Manipulation Trip
 
@@ -81,7 +82,8 @@ public class TripController {
       return ResponseEntity.ok(rawTrip);
     }
 
-    throw new DataNotFoundException("The trip " + tripId + " was not found");
+    throw new DataNotFoundException(
+        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
 
   @GetMapping("/{tripId}/confirm")
@@ -96,7 +98,8 @@ public class TripController {
       return ResponseEntity.ok(rawTrip);
     }
 
-    throw new DataNotFoundException("The trip " + tripId + " was not found");
+    throw new DataNotFoundException(
+        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
 
   // Endpoints Activities Trip
@@ -114,7 +117,8 @@ public class TripController {
       return ResponseEntity.ok(new ActivityResponsePayload(activityId.toString()));
     }
 
-    throw new DataNotFoundException("The trip " + tripId + " was not found");
+    throw new DataNotFoundException(
+        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
 
 
@@ -127,7 +131,8 @@ public class TripController {
       return ResponseEntity.ok(activities);
     }
 
-    throw new DataNotFoundException("The trip " + tripId + " was not found");
+    throw new DataNotFoundException(
+        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
 
   // Endpoints Participants Trip
@@ -150,7 +155,8 @@ public class TripController {
       return ResponseEntity.ok(response);
     }
 
-    throw new DataNotFoundException("The trip " + tripId + " was not found");
+    throw new DataNotFoundException(
+        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
 
   @GetMapping("/{tripId}/participants")
@@ -174,10 +180,9 @@ public class TripController {
       return ResponseEntity.ok(response);
     }
 
-    throw new DataNotFoundException("The trip " + tripId + " was not found");
+    throw new DataNotFoundException(
+        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
-
-  // TODO: improve to deal error globally and when recover data that not exist show the specifically response
 
   @GetMapping("/{tripId}/links")
   public ResponseEntity<List<LinkResponsePayload>> getAALinks(@PathVariable("tripId") UUID tripId) {
@@ -188,7 +193,8 @@ public class TripController {
       return ResponseEntity.ok(linksTrip);
     }
 
-    throw new DataNotFoundException("The trip " + tripId + " was not found");
+    throw new DataNotFoundException(
+        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
 
 }
