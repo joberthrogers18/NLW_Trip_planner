@@ -123,29 +123,16 @@ public class TripController {
   public ResponseEntity<LinkResponsePayload> registerLink(@PathVariable("tripId") UUID tripId,
       @RequestBody
       LinkRequestPayload payload) {
-
-    Optional<Trip> trip = this.tripRepository.findById(tripId);
-
-    if (trip.isPresent()) {
-      LinkResponsePayload response = this.linkService.registerLinkToTrip(payload, trip.get());
-      return ResponseEntity.ok(response);
-    }
-
-    throw new DataNotFoundException(
-        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
+    Trip tripResponse = this.tripService.getTripById(tripId);
+    LinkResponsePayload response = this.linkService.registerLinkToTrip(payload, tripResponse);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{tripId}/links")
   public ResponseEntity<List<LinkResponsePayload>> getAALinks(@PathVariable("tripId") UUID tripId) {
-    Optional<Trip> trip = this.tripRepository.findById(tripId);
-
-    if (trip.isPresent()) {
+      this.tripService.getTripById(tripId);
       List<LinkResponsePayload> linksTrip = this.linkService.getAllLinksById(tripId);
       return ResponseEntity.ok(linksTrip);
-    }
-
-    throw new DataNotFoundException(
-        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
   }
 
 }
