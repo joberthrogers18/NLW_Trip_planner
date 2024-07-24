@@ -104,27 +104,15 @@ public class TripController {
   public ResponseEntity<InviteResponseTrip> inviteParticipant(@PathVariable("tripId") UUID tripId,
       @RequestBody
       ParticipantRequestPayload payload) {
-    Optional<Trip> currentTrip = this.tripRepository.findById(tripId);
-
-    if (currentTrip.isPresent()) {
-      Trip rawTrip = currentTrip.get();
-      InviteResponseTrip response = this.participantService.registerParticipantToEvent(
-          payload.email(), rawTrip);
-
-      if (rawTrip.getIsConfirmed()) {
-        this.participantService.triggerConfirmationEmailToParticipant(payload.email());
-      }
-
-      return ResponseEntity.ok(response);
-    }
-
-    throw new DataNotFoundException(
-        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
+    Trip tripResponse = this.tripService.getTripById(tripId);
+    InviteResponseTrip response = this.tripService.inviteParticipantToTrip(tripResponse, payload);
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{tripId}/participants")
   public ResponseEntity<List<ParticipantsData>> getParticipantsFromTrip(
       @PathVariable("tripId") UUID tripId) {
+    this.tripService.getTripById(tripId);
     List<ParticipantsData> participants = this.participantService.getAllParticipants(tripId);
     return ResponseEntity.ok(participants);
   }

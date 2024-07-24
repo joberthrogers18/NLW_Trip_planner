@@ -4,6 +4,8 @@ import com.rocketseat.planner.activity.ActivityRequestPayload;
 import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
 import com.rocketseat.planner.exceptions.DataNotFoundException;
+import com.rocketseat.planner.participant.InviteResponseTrip;
+import com.rocketseat.planner.participant.ParticipantRequestPayload;
 import com.rocketseat.planner.participant.ParticipantService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -60,5 +62,14 @@ public class TripService {
     UUID activityId = this.activityService.registerActivity(activityPayload.title(),
         LocalDateTime.parse(activityPayload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip);
     return activityId.toString();
+  }
+
+  public InviteResponseTrip inviteParticipantToTrip(Trip trip, ParticipantRequestPayload participantRequestPayload) {
+    InviteResponseTrip response = this.participantService.registerParticipantToEvent(
+        participantRequestPayload.email(), trip);
+    if (trip.getIsConfirmed()) {
+      this.participantService.triggerConfirmationEmailToParticipant(participantRequestPayload.email());
+    }
+    return response;
   }
 }
