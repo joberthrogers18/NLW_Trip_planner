@@ -8,8 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class ActivityService {
 
+  private final ActivityRepository activityRepository;
+
   @Autowired
-  private ActivityRepository activityRepository;
+  public ActivityService(ActivityRepository activityRepository) {
+    this.activityRepository = activityRepository;
+  }
 
   public UUID registerActivity(String title, LocalDateTime occursAt, Trip trip) {
     Activity activity = new Activity(title, occursAt, trip);
@@ -19,7 +23,7 @@ public class ActivityService {
 
   public List<ActivityData> getAllActivitiesFromId(UUID tripId) {
     return this.activityRepository.findByTripId(tripId).stream().map(
-        (activity) -> new ActivityData(activity.getId(), activity.getTitle(),
+        activity -> new ActivityData(activity.getId(), activity.getTitle(),
             activity.getOccursAt().toString())).toList();
   }
 

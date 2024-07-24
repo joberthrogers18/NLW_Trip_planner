@@ -52,7 +52,8 @@ public class TripController {
   // Endpoints Manipulation Trip
 
   @PostMapping
-  public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payloadTrip) {
+  public ResponseEntity<TripCreateResponse> createTrip(
+      @RequestBody TripRequestPayload payloadTrip) {
     Trip newTrip = this.tripService.registerTrip(payloadTrip);
     return ResponseEntity.ok().body(new TripCreateResponse(newTrip.getId()));
   }
@@ -66,37 +67,16 @@ public class TripController {
   @PutMapping("/{tripId}")
   public ResponseEntity<Trip> updateTrip(@PathVariable("tripId") UUID tripId,
       @RequestBody TripRequestPayload payload) {
-    Optional<Trip> currentTrip = this.tripRepository.findById(tripId);
-
-    if (currentTrip.isPresent()) {
-      Trip rawTrip = currentTrip.get();
-      rawTrip.setDestination(payload.destination());
-      rawTrip.setEndsAt(LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
-      rawTrip.setStartsAt(
-          LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
-
-      this.tripRepository.save(rawTrip);
-      return ResponseEntity.ok(rawTrip);
-    }
-
-    throw new DataNotFoundException(
-        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
+    Trip tripResponse = this.tripService.getTripById(tripId);
+    Trip updatedTrip = this.tripService.updateTrip(tripResponse, payload);
+    return ResponseEntity.ok(updatedTrip);
   }
 
   @GetMapping("/{tripId}/confirm")
   public ResponseEntity<Trip> confirmTrip(@PathVariable("tripId") UUID tripId) {
-    Optional<Trip> currentTrip = this.tripRepository.findById(tripId);
-
-    if (currentTrip.isPresent()) {
-      Trip rawTrip = currentTrip.get();
-      rawTrip.setIsConfirmed(true);
-      this.tripRepository.save(rawTrip);
-      this.participantService.triggerConfirmationEmailToParticipants(tripId);
-      return ResponseEntity.ok(rawTrip);
-    }
-
-    throw new DataNotFoundException(
-        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
+    Trip tripResponse = this.tripService.getTripById(tripId);
+    Trip updatedTrip = this.tripService.confirmTrip(tripResponse);
+    return ResponseEntity.ok(updatedTrip);
   }
 
   // Endpoints Activities Trip
@@ -105,31 +85,17 @@ public class TripController {
   public ResponseEntity<ActivityResponsePayload> registerActivity(
       @PathVariable("tripId") UUID tripId, @RequestBody
   ActivityRequestPayload payload) {
-    Optional<Trip> trip = this.tripRepository.findById(tripId);
-
-    if (trip.isPresent()) {
-      UUID activityId = this.activityService.registerActivity(payload.title(),
-          LocalDateTime.parse(payload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip.get());
-
-      return ResponseEntity.ok(new ActivityResponsePayload(activityId.toString()));
-    }
-
-    throw new DataNotFoundException(
-        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
+    Trip tripResponse = this.tripService.getTripById(tripId);
+    String activityId = this.tripService.createActivityTrip(tripResponse, payload);
+    return ResponseEntity.ok(new ActivityResponsePayload(activityId));
   }
 
 
   @GetMapping("/{tripId}/activities")
   public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable("tripId") UUID tripId) {
-    Optional<Trip> trip = this.tripRepository.findById(tripId);
-
-    if (trip.isPresent()) {
-      List<ActivityData> activities = this.activityService.getAllActivitiesFromId(tripId);
-      return ResponseEntity.ok(activities);
-    }
-
-    throw new DataNotFoundException(
-        ERROR_TRIP_NOT_FOUND_MESSAGE.replace(KEY_REPLACE_MESSAGE_ERROR, tripId.toString()));
+    this.tripService.getTripById(tripId);
+    List<ActivityData> activities = this.activityService.getAllActivitiesFromId(tripId);
+    return ResponseEntity.ok(activities);
   }
 
   // Endpoints Participants Trip
