@@ -1,6 +1,7 @@
 package com.rocketseat.planner.participant;
 
 import com.rocketseat.planner.exceptions.DataNotFoundException;
+import jakarta.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ParticipantController {
 
   @PostMapping("/{idParticipant}/confirm")
   public ResponseEntity<Participant> confirmParticipant(@PathVariable("idParticipant") UUID id,
-      @RequestBody ParticipantRequestPayload payload) {
+      @Valid  @RequestBody ParticipantRequestPayload payload) {
     Optional<Participant> participant = this.participantRepository.findById(id);
 
     if (participant.isPresent()) {

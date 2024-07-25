@@ -57,7 +57,7 @@ public class TripController {
 
   @PutMapping("/{tripId}")
   public ResponseEntity<Trip> updateTrip(@PathVariable("tripId") UUID tripId,
-      @RequestBody TripRequestPayload payload) {
+      @Valid @RequestBody TripRequestPayload payload) {
     Trip tripResponse = this.tripService.getTripById(tripId);
     Trip updatedTrip = this.tripService.updateTrip(tripResponse, payload);
     return ResponseEntity.ok(updatedTrip);
@@ -74,7 +74,7 @@ public class TripController {
 
   @PostMapping("/{tripId}/activities")
   public ResponseEntity<ActivityResponsePayload> registerActivity(
-      @PathVariable("tripId") UUID tripId, @RequestBody ActivityRequestPayload payload) {
+      @PathVariable("tripId") UUID tripId, @Valid @RequestBody ActivityRequestPayload payload) {
     Trip tripResponse = this.tripService.getTripById(tripId);
     String activityId = this.tripService.createActivityTrip(tripResponse, payload);
     return ResponseEntity.ok(new ActivityResponsePayload(activityId));
@@ -92,7 +92,7 @@ public class TripController {
 
   @PostMapping("/{tripId}/invite")
   public ResponseEntity<InviteResponseTrip> inviteParticipant(@PathVariable("tripId") UUID tripId,
-      @RequestBody ParticipantRequestPayload payload) {
+      @Valid @RequestBody ParticipantRequestPayload payload) {
     Trip tripResponse = this.tripService.getTripById(tripId);
     InviteResponseTrip response = this.tripService.inviteParticipantToTrip(tripResponse, payload);
     return ResponseEntity.ok(response);
@@ -110,7 +110,7 @@ public class TripController {
 
   @PostMapping("/{tripId}/links")
   public ResponseEntity<LinkResponsePayload> registerLink(@PathVariable("tripId") UUID tripId,
-      @RequestBody LinkRequestPayload payload) {
+      @Valid @RequestBody LinkRequestPayload payload) {
     Trip tripResponse = this.tripService.getTripById(tripId);
     LinkResponsePayload response = this.linkService.registerLinkToTrip(payload, tripResponse);
     return ResponseEntity.ok(response);

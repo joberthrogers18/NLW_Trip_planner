@@ -11,14 +11,14 @@ public class IsoDateValidator implements ConstraintValidator<ValidISODate, Strin
 
   @Override
   public void initialize(ValidISODate constraintAnnotation) {
-    // Any initialization needed can be done here.
   }
 
   @Override
   public boolean isValid(String dateStr, ConstraintValidatorContext context) {
     if (dateStr == null) {
-      return false; // or true if you want to allow null values
+      return false;
     }
+
     try {
       ISO_DATE_FORMATTER.parse(dateStr);
       return true;

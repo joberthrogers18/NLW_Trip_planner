@@ -1,7 +1,13 @@
 package com.rocketseat.planner.participant;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record ParticipantRequestPayload(
-    String name, String email
+    @NotBlank(message = "name is mandatory")
+    String name,
+
+    @NotBlank(message = "email is mandatory")
+    String email
 ) {
 
 }

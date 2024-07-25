@@ -1,5 +1,6 @@
 package com.rocketseat.planner.trip;
 
+import com.rocketseat.planner.validations.ValidISODate;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
@@ -8,9 +9,11 @@ public record TripRequestPayload(
     @NotBlank(message = "destination is mandatory")
     String destination,
 
+    @ValidISODate
     @NotBlank(message = "start_at is mandatory")
     String starts_at,
 
+    @ValidISODate
     @NotBlank(message = "ends_at is mandatory")
     String ends_at,
 
