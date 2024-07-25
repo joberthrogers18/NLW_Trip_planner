@@ -1,9 +1,27 @@
 package com.rocketseat.planner.trip;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
-public record TripRequestPayload(String destination, String starts_at, String ends_at,
-                                 List<String> emails_to_invite, String owner_email,
-                                 String owner_name) {
+public record TripRequestPayload(
+    @NotBlank(message = "destination is mandatory")
+    String destination,
+
+    @NotBlank(message = "start_at is mandatory")
+    String starts_at,
+
+    @NotBlank(message = "ends_at is mandatory")
+    String ends_at,
+
+    List<String> emails_to_invite,
+
+    @Email(message = "The attribute owner_email is not a valid email")
+    @NotBlank(message = "owner_email is mandatory")
+    String owner_email,
+
+    @NotBlank(message = "owner_name attribute is mandatory")
+    String owner_name
+) {
 
 }

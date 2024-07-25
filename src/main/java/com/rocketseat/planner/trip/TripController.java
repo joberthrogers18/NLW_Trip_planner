@@ -4,7 +4,6 @@ import com.rocketseat.planner.activity.ActivityData;
 import com.rocketseat.planner.activity.ActivityRequestPayload;
 import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
-import com.rocketseat.planner.exceptions.DataNotFoundException;
 import com.rocketseat.planner.link.LinkRequestPayload;
 import com.rocketseat.planner.link.LinkResponsePayload;
 import com.rocketseat.planner.link.LinkService;
@@ -12,13 +11,9 @@ import com.rocketseat.planner.participant.InviteResponseTrip;
 import com.rocketseat.planner.participant.ParticipantRequestPayload;
 import com.rocketseat.planner.participant.ParticipantService;
 import com.rocketseat.planner.participant.ParticipantsData;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import javax.swing.text.html.Option;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,18 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/trips")
 public class TripController {
 
-  private static final String ERROR_TRIP_NOT_FOUND_MESSAGE = "The trip {tripId} was not found";
-  private static final String KEY_REPLACE_MESSAGE_ERROR = "{tripId}";
   private final ParticipantService participantService;
-  private final TripRepository tripRepository;
   private final ActivityService activityService;
   private final LinkService linkService;
   private final TripService tripService;
 
-  public TripController(ParticipantService participantService, TripRepository tripRepository,
-      ActivityService activityService, LinkService linkService, TripService tripService) {
+  public TripController(ParticipantService participantService, ActivityService activityService,
+      LinkService linkService, TripService tripService) {
     this.participantService = participantService;
-    this.tripRepository = tripRepository;
     this.activityService = activityService;
     this.linkService = linkService;
     this.tripService = tripService;
@@ -53,7 +44,7 @@ public class TripController {
 
   @PostMapping
   public ResponseEntity<TripCreateResponse> createTrip(
-      @RequestBody TripRequestPayload payloadTrip) {
+      @Valid @RequestBody TripRequestPayload payloadTrip) {
     Trip newTrip = this.tripService.registerTrip(payloadTrip);
     return ResponseEntity.ok().body(new TripCreateResponse(newTrip.getId()));
   }
@@ -83,8 +74,7 @@ public class TripController {
 
   @PostMapping("/{tripId}/activities")
   public ResponseEntity<ActivityResponsePayload> registerActivity(
-      @PathVariable("tripId") UUID tripId, @RequestBody
-  ActivityRequestPayload payload) {
+      @PathVariable("tripId") UUID tripId, @RequestBody ActivityRequestPayload payload) {
     Trip tripResponse = this.tripService.getTripById(tripId);
     String activityId = this.tripService.createActivityTrip(tripResponse, payload);
     return ResponseEntity.ok(new ActivityResponsePayload(activityId));
@@ -102,8 +92,7 @@ public class TripController {
 
   @PostMapping("/{tripId}/invite")
   public ResponseEntity<InviteResponseTrip> inviteParticipant(@PathVariable("tripId") UUID tripId,
-      @RequestBody
-      ParticipantRequestPayload payload) {
+      @RequestBody ParticipantRequestPayload payload) {
     Trip tripResponse = this.tripService.getTripById(tripId);
     InviteResponseTrip response = this.tripService.inviteParticipantToTrip(tripResponse, payload);
     return ResponseEntity.ok(response);
@@ -121,8 +110,7 @@ public class TripController {
 
   @PostMapping("/{tripId}/links")
   public ResponseEntity<LinkResponsePayload> registerLink(@PathVariable("tripId") UUID tripId,
-      @RequestBody
-      LinkRequestPayload payload) {
+      @RequestBody LinkRequestPayload payload) {
     Trip tripResponse = this.tripService.getTripById(tripId);
     LinkResponsePayload response = this.linkService.registerLinkToTrip(payload, tripResponse);
     return ResponseEntity.ok(response);
@@ -130,9 +118,9 @@ public class TripController {
 
   @GetMapping("/{tripId}/links")
   public ResponseEntity<List<LinkResponsePayload>> getAALinks(@PathVariable("tripId") UUID tripId) {
-      this.tripService.getTripById(tripId);
-      List<LinkResponsePayload> linksTrip = this.linkService.getAllLinksById(tripId);
-      return ResponseEntity.ok(linksTrip);
+    this.tripService.getTripById(tripId);
+    List<LinkResponsePayload> linksTrip = this.linkService.getAllLinksById(tripId);
+    return ResponseEntity.ok(linksTrip);
   }
 
 }
