@@ -44,7 +44,7 @@ public class TripController {
 
   @PostMapping
   public ResponseEntity<TripCreateResponse> createTrip(
-      @Valid @RequestBody TripRequestPayload payloadTrip) {
+      @Valid @RequestBody TripRequestPayload payloadTrip) throws IllegalAccessException {
     Trip newTrip = this.tripService.registerTrip(payloadTrip);
     return ResponseEntity.ok().body(new TripCreateResponse(newTrip.getId()));
   }
@@ -57,7 +57,7 @@ public class TripController {
 
   @PutMapping("/{tripId}")
   public ResponseEntity<Trip> updateTrip(@PathVariable("tripId") UUID tripId,
-      @Valid @RequestBody TripRequestPayload payload) {
+      @Valid @RequestBody TripRequestPayload payload) throws IllegalAccessException {
     Trip tripResponse = this.tripService.getTripById(tripId);
     Trip updatedTrip = this.tripService.updateTrip(tripResponse, payload);
     return ResponseEntity.ok(updatedTrip);
@@ -74,7 +74,8 @@ public class TripController {
 
   @PostMapping("/{tripId}/activities")
   public ResponseEntity<ActivityResponsePayload> registerActivity(
-      @PathVariable("tripId") UUID tripId, @Valid @RequestBody ActivityRequestPayload payload) {
+      @PathVariable("tripId") UUID tripId, @Valid @RequestBody ActivityRequestPayload payload)
+      throws IllegalAccessException {
     Trip tripResponse = this.tripService.getTripById(tripId);
     String activityId = this.tripService.createActivityTrip(tripResponse, payload);
     return ResponseEntity.ok(new ActivityResponsePayload(activityId));

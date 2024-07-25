@@ -10,6 +10,7 @@ import com.rocketseat.planner.participant.ParticipantService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,32 @@ public class TripService {
     this.activityService = activityService;
   }
 
-  public Trip registerTrip(TripRequestPayload payloadTrip) {
+  private void verifyStartEndDateTrip(String startsTripDate, String endsTripDate)
+      throws IllegalAccessException {
+    LocalDateTime startsDateTrip = LocalDateTime.parse(startsTripDate,
+        DateTimeFormatter.ISO_DATE_TIME);
+    LocalDateTime endsDateTrip = LocalDateTime.parse(endsTripDate, DateTimeFormatter.ISO_DATE_TIME);
+
+    if (startsDateTrip.isAfter(endsDateTrip)) {
+      throw new IllegalAccessException("The date start date trip is happen after the ends date");
+    }
+  }
+
+  private void verifyActivityOccursRangeTrip(String occursDate, Trip trip)
+      throws IllegalAccessException {
+    LocalDateTime occursDateParse = LocalDateTime.parse(occursDate,
+        DateTimeFormatter.ISO_DATE_TIME);
+
+    if ((occursDateParse.isEqual(trip.getStartsAt()) || occursDateParse.isAfter(trip.getEndsAt()))
+        && (occursDateParse.isBefore(trip.getEndsAt()) || occursDateParse.isEqual(
+        trip.getEndsAt()))) {
+      throw new IllegalAccessException(
+          "The occurs date activity is out of range from trip occurrence");
+    }
+  }
+
+  public Trip registerTrip(TripRequestPayload payloadTrip) throws IllegalAccessException {
+    this.verifyStartEndDateTrip(payloadTrip.starts_at(), payloadTrip.ends_at());
     Trip newTrip = new Trip(payloadTrip);
     this.tripRepository.save(newTrip);
     participantService.registerParticipantsToEvent(payloadTrip.emails_to_invite(), newTrip);
@@ -41,7 +67,9 @@ public class TripService {
         .orElseThrow(() -> new DataNotFoundException("The trip " + tripId + " was not found"));
   }
 
-  public Trip updateTrip(Trip baseTrip, TripRequestPayload tripPayload) {
+  public Trip updateTrip(Trip baseTrip, TripRequestPayload tripPayload)
+      throws IllegalAccessException {
+    this.verifyStartEndDateTrip(tripPayload.starts_at(), tripPayload.ends_at());
     baseTrip.setDestination(tripPayload.destination());
     baseTrip.setEndsAt(LocalDateTime.parse(tripPayload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
     baseTrip.setStartsAt(
@@ -58,17 +86,21 @@ public class TripService {
     return baseTrip;
   }
 
-  public String createActivityTrip(Trip trip, ActivityRequestPayload activityPayload) {
+  public String createActivityTrip(Trip trip, ActivityRequestPayload activityPayload)
+      throws IllegalAccessException {
+    this.verifyActivityOccursRangeTrip(activityPayload.occurs_at(), trip);
     UUID activityId = this.activityService.registerActivity(activityPayload.title(),
         LocalDateTime.parse(activityPayload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip);
     return activityId.toString();
   }
 
-  public InviteResponseTrip inviteParticipantToTrip(Trip trip, ParticipantRequestPayload participantRequestPayload) {
+  public InviteResponseTrip inviteParticipantToTrip(Trip trip,
+      ParticipantRequestPayload participantRequestPayload) {
     InviteResponseTrip response = this.participantService.registerParticipantToEvent(
         participantRequestPayload.email(), trip);
     if (trip.getIsConfirmed()) {
-      this.participantService.triggerConfirmationEmailToParticipant(participantRequestPayload.email());
+      this.participantService.triggerConfirmationEmailToParticipant(
+          participantRequestPayload.email());
     }
     return response;
   }
