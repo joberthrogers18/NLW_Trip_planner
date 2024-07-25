@@ -4,6 +4,7 @@ import com.rocketseat.planner.activity.ActivityData;
 import com.rocketseat.planner.activity.ActivityRequestPayload;
 import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
+import com.rocketseat.planner.exceptions.RequiredArgumentsIllegalException;
 import com.rocketseat.planner.link.LinkRequestPayload;
 import com.rocketseat.planner.link.LinkResponsePayload;
 import com.rocketseat.planner.link.LinkService;
@@ -48,7 +49,7 @@ public class TripController {
   @PostMapping
   @Operation(summary = "Create a trip", description = "This endpoint create a raw trip.")
   public ResponseEntity<TripCreateResponse> createTrip(
-      @Valid @RequestBody TripRequestPayload payloadTrip) throws IllegalAccessException {
+      @Valid @RequestBody TripRequestPayload payloadTrip) throws RequiredArgumentsIllegalException {
     Trip newTrip = this.tripService.registerTrip(payloadTrip);
     return ResponseEntity.ok().body(new TripCreateResponse(newTrip.getId()));
   }
@@ -63,7 +64,7 @@ public class TripController {
   @PutMapping("/{tripId}")
   @Operation(summary = "Update trip", description = "Using the tripId and update information is possible update the current trip.")
   public ResponseEntity<Trip> updateTrip(@PathVariable("tripId") UUID tripId,
-      @Valid @RequestBody TripRequestPayload payload) throws IllegalAccessException {
+      @Valid @RequestBody TripRequestPayload payload) throws RequiredArgumentsIllegalException {
     Trip tripResponse = this.tripService.getTripById(tripId);
     Trip updatedTrip = this.tripService.updateTrip(tripResponse, payload);
     return ResponseEntity.ok(updatedTrip);
@@ -83,7 +84,7 @@ public class TripController {
   @Operation(summary = "Create activity trip", description = "The user can assign an activity to current trip")
   public ResponseEntity<ActivityResponsePayload> registerActivity(
       @PathVariable("tripId") UUID tripId, @Valid @RequestBody ActivityRequestPayload payload)
-      throws IllegalAccessException {
+      throws RequiredArgumentsIllegalException {
     Trip tripResponse = this.tripService.getTripById(tripId);
     String activityId = this.tripService.createActivityTrip(tripResponse, payload);
     return ResponseEntity.ok(new ActivityResponsePayload(activityId));

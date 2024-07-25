@@ -1,18 +1,16 @@
 package com.rocketseat.planner.trip;
 
 import com.rocketseat.planner.activity.ActivityRequestPayload;
-import com.rocketseat.planner.activity.ActivityResponsePayload;
 import com.rocketseat.planner.activity.ActivityService;
 import com.rocketseat.planner.exceptions.DataNotFoundException;
+import com.rocketseat.planner.exceptions.RequiredArgumentsIllegalException;
 import com.rocketseat.planner.participant.InviteResponseTrip;
 import com.rocketseat.planner.participant.ParticipantRequestPayload;
 import com.rocketseat.planner.participant.ParticipantService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,30 +29,30 @@ public class TripService {
   }
 
   private void verifyStartEndDateTrip(String startsTripDate, String endsTripDate)
-      throws IllegalAccessException {
+      throws RequiredArgumentsIllegalException {
     LocalDateTime startsDateTrip = LocalDateTime.parse(startsTripDate,
         DateTimeFormatter.ISO_DATE_TIME);
     LocalDateTime endsDateTrip = LocalDateTime.parse(endsTripDate, DateTimeFormatter.ISO_DATE_TIME);
 
     if (startsDateTrip.isAfter(endsDateTrip)) {
-      throw new IllegalAccessException("The date start date trip is happen after the ends date");
+      throw new RequiredArgumentsIllegalException("The date start date trip is happen after the ends date");
     }
   }
 
   private void verifyActivityOccursRangeTrip(String occursDate, Trip trip)
-      throws IllegalAccessException {
+      throws RequiredArgumentsIllegalException {
     LocalDateTime occursDateParse = LocalDateTime.parse(occursDate,
         DateTimeFormatter.ISO_DATE_TIME);
 
     if ((occursDateParse.isEqual(trip.getStartsAt()) || occursDateParse.isAfter(trip.getEndsAt()))
         && (occursDateParse.isBefore(trip.getEndsAt()) || occursDateParse.isEqual(
         trip.getEndsAt()))) {
-      throw new IllegalAccessException(
+      throw new RequiredArgumentsIllegalException(
           "The occurs date activity is out of range from trip occurrence");
     }
   }
 
-  public Trip registerTrip(TripRequestPayload payloadTrip) throws IllegalAccessException {
+  public Trip registerTrip(TripRequestPayload payloadTrip) throws RequiredArgumentsIllegalException {
     this.verifyStartEndDateTrip(payloadTrip.starts_at(), payloadTrip.ends_at());
     Trip newTrip = new Trip(payloadTrip);
     this.tripRepository.save(newTrip);
@@ -68,7 +66,7 @@ public class TripService {
   }
 
   public Trip updateTrip(Trip baseTrip, TripRequestPayload tripPayload)
-      throws IllegalAccessException {
+      throws RequiredArgumentsIllegalException {
     this.verifyStartEndDateTrip(tripPayload.starts_at(), tripPayload.ends_at());
     baseTrip.setDestination(tripPayload.destination());
     baseTrip.setEndsAt(LocalDateTime.parse(tripPayload.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
@@ -87,7 +85,7 @@ public class TripService {
   }
 
   public String createActivityTrip(Trip trip, ActivityRequestPayload activityPayload)
-      throws IllegalAccessException {
+      throws RequiredArgumentsIllegalException {
     this.verifyActivityOccursRangeTrip(activityPayload.occurs_at(), trip);
     UUID activityId = this.activityService.registerActivity(activityPayload.title(),
         LocalDateTime.parse(activityPayload.occurs_at(), DateTimeFormatter.ISO_LOCAL_DATE), trip);
