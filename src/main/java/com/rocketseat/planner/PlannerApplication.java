@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class PlannerApplication {
 
   // TODO: add unit tests
-  // TODO: add swagger documentation
   // TODO: dockerize the application
   // TODO: use database SQL and Cache
 

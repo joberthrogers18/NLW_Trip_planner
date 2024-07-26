@@ -13,9 +13,8 @@ public class LinkService {
   private LinkRepository linkRepository;
 
   public LinkResponsePayload registerLinkToTrip(LinkRequestPayload linkInfo, Trip trip) {
-    Link link = new Link(linkInfo.title(), linkInfo.url(), trip);
-    this.linkRepository.save(link);
-    return new LinkResponsePayload(link.getId().toString(), link.getTitle(), link.getUrl());
+    Link responseLink = this.linkRepository.save(new Link(linkInfo.title(), linkInfo.url(), trip));
+    return new LinkResponsePayload(responseLink.getId().toString(), responseLink.getTitle(), responseLink.getUrl());
   }
 
   public List<LinkResponsePayload> getAllLinksById(UUID tripId) {
