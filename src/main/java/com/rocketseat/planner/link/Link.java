@@ -1,6 +1,7 @@
 package com.rocketseat.planner.link;
 
 import com.rocketseat.planner.trip.Trip;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Link from trip")
 public class Link {
 
   @Id

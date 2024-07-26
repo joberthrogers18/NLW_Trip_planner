@@ -1,6 +1,7 @@
 package com.rocketseat.planner.participant;
 
 import com.rocketseat.planner.trip.Trip;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "Participants from trip")
 public class Participant {
 
   @Id
