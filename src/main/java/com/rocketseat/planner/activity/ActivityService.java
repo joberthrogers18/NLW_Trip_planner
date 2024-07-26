@@ -10,16 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ActivityService {
 
-  private final ActivityRepository activityRepository;
-
   @Autowired
-  public ActivityService(ActivityRepository activityRepository) {
-    this.activityRepository = activityRepository;
-  }
+  private ActivityRepository activityRepository;
 
   public UUID registerActivity(String title, LocalDateTime occursAt, Trip trip) {
-    Activity activity = new Activity(title, occursAt, trip);
-    this.activityRepository.save(activity);
+    Activity activity = this.activityRepository.save(new Activity(title, occursAt, trip));
     return activity.getId();
   }
 
